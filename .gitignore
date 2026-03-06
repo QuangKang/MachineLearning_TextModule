@@ -205,3 +205,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+#tự thêm
+__pycache__/
+.ipynb_checkpoints/
+*.npy
+*.h5
+*.pkl
+*.joblib
+data/
+features/
