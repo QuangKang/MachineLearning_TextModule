@@ -5,9 +5,6 @@ from sklearn.base import BaseEstimator
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import LinearSVC
-from modules.metrics import calculate_metrics, EvalResult, print_result
-
-def get_model(model_type: str, C: float = 1.0, max_iter: int = 200) -> BaseEstimator:
 from sklearn.model_selection import GridSearchCV
 from modules.metrics import calculate_metrics, EvalResult, print_result, plot_confusion_matrix
 
@@ -18,7 +15,6 @@ def get_model(model_type: str, C: float = 1.0, alpha: float = 1.0, max_iter: int
     if model_type == "logistic_regression":
         return LogisticRegression(C=C, max_iter=max_iter)
     elif model_type == "naive_bayes":
-        return MultinomialNB()
         return MultinomialNB(alpha=alpha)
     elif model_type == "svm":
         return LinearSVC(C=C, max_iter=max_iter, dual=False)
@@ -27,11 +23,11 @@ def get_model(model_type: str, C: float = 1.0, alpha: float = 1.0, max_iter: int
     
 def train_eval(
     model: BaseEstimator,
-    model_type: str,
     X_train: np.ndarray,
     y_train: np.ndarray,
     X_test: np.ndarray,
     y_test: np.ndarray,
+    model_type: str | None = None,
 ) -> EvalResult:
     # 1. Huấn luyện dựa trên model được truyền vào
     model.fit(X_train, y_train)
@@ -71,8 +67,15 @@ if __name__ == "__main__":
     model_nb = get_model("naive_bayes")
     result_nb = train_eval(model_nb, X_train, y_train, X_test, y_test)
     print("Kết quả:", print_result(result_nb))
+
+def train_eval_with_tuning(
+    model_type: str,
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    X_test: np.ndarray,
+    y_test: np.ndarray,
     class_names: list,
-    save: str="results"
+    save: str = "results"
 ) -> EvalResult:
     """
     Hàm thực hiện Tuning nhẹ, dự đoán và xuất Confusion Matrix.
@@ -100,12 +103,13 @@ if __name__ == "__main__":
     result = calculate_metrics(y_test, y_pred)
 
     # 5. Vẽ và lưu Confusion Matrix
+    os.makedirs(save, exist_ok=True)
     save_path = os.path.join(save, f"cm_{model_type}.png")
     plot_confusion_matrix(y_test, y_pred, class_names, save_path, title=f"Confusion Matrix - {model_type.upper()}")
 
     return result
-    
-# --- PHẦN TEST VỚI DUMMY FEATURES ---
+
+# --- PHẦN TEST VỚI DUMMY FEATURES (TUNING) ---
 if __name__ == "__main__":
     from sklearn.datasets import make_classification
     from sklearn.model_selection import train_test_split
@@ -121,9 +125,9 @@ if __name__ == "__main__":
     dummy_classes = ["Class 0", "Class 1", "Class 2", "Class 3"]
 
     # Chạy thử quy trình cho Logistic Regression
-    res_lr = train_eval("logistic_regression", X_train, y_train, X_test, y_test, dummy_classes)
+    res_lr = train_eval_with_tuning("logistic_regression", X_train, y_train, X_test, y_test, dummy_classes)
     print("Kết quả LR:", print_result(res_lr))
 
     # Chạy thử quy trình cho Naive Bayes
-    res_nb = train_eval("naive_bayes", X_train, y_train, X_test, y_test, dummy_classes)
+    res_nb = train_eval_with_tuning("naive_bayes", X_train, y_train, X_test, y_test, dummy_classes)
     print("Kết quả NB:", print_result(res_nb))

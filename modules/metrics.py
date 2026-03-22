@@ -42,7 +42,6 @@ def print_result(result: EvalResult) -> Dict[str, Any]:
         "recall_weighted": result.recall_weighted,
         "f1_weighted": result.f1_weighted
     }
-    }
 
 def plot_confusion_matrix(y_true, y_pred, class_names: List[str], save_path: str, title: str = "Confusion Matrix"):
     """
