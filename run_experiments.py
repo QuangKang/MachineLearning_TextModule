@@ -1,4 +1,5 @@
 import time
+import numpy as np
 from modules.data_loader import load_data
 from modules.text_preprocess import TextCleaner
 from modules.tfidf_features import build_tfidf_features, save_features_npy
@@ -17,6 +18,11 @@ def clean_large_corpus(cleaner, corpus, batch_print=20000):
 def main():
     print("=== BƯỚC 1: TẢI TOÀN BỘ DỮ LIỆU ===")
     train_texts, y_train, test_texts, y_test, info = load_data("ag_news")
+    
+    # Ép kiểu nhãn về định dạng NumPy Array để tương thích với Scikit-learn GridSearchCV
+    y_train = np.array(y_train)
+    y_test = np.array(y_test)
+    
     print(f"Đã tải xong! Tập Train gốc: {info.train_size} mẫu, Tập Test gốc: {info.test_size} mẫu.\n")
 
     print("=== BƯỚC 2: TIỀN XỬ LÝ TOÀN BỘ DỮ LIỆU ===")
