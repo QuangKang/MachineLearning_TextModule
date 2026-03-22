@@ -4,10 +4,17 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-# Tải các gói dữ liệu cần thiết từ nltk
-nltk.download('punkt')
-nltk.download('punkt_tab')
-nltk.download('stopwords')
+# Tải các gói dữ liệu cần thiết từ nltk (Chỉ tải nếu máy chưa có)
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    nltk.download('punkt')
+    nltk.download('punkt_tab')
+
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
 
 class TextCleaner:
     def __init__(self, language='english'):
