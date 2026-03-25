@@ -7,6 +7,7 @@ trains baseline classifiers, and saves a benchmark report.
 
 from __future__ import annotations
 
+import argparse
 import sys
 import time
 from collections import defaultdict
@@ -35,7 +36,18 @@ from modules.data_loader import load_data
 from modules.train_classical import get_model
 
 
-def main() -> None:
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run SBERT benchmark on selected dataset scales.")
+    parser.add_argument(
+        "--scales",
+        nargs="+",
+        default=["5k_2k", "20k_2k"],
+        help="Benchmark scales to run. Choices: 5k_2k, 20k_2k",
+    )
+    return parser.parse_args()
+
+
+def main(scales: list[str] | None = None) -> None:
     print("\n" + "=" * 80)
     print(" " * 20 + "BERT EMBEDDING BENCHMARK")
     print("=" * 80)
@@ -54,10 +66,15 @@ def main() -> None:
     print(f"  Test:  {len(test_texts):,} samples")
     print(f"  Classes: {info.num_classes}")
 
-    bench_sizes = {
+    all_bench_sizes = {
         "5k_2k": {"train": 5000, "test": 2000},
         "20k_2k": {"train": 20000, "test": 2000},
     }
+
+    requested_scales = scales if scales is not None else ["5k_2k", "20k_2k"]
+    bench_sizes = {k: all_bench_sizes[k] for k in requested_scales if k in all_bench_sizes}
+    if not bench_sizes:
+        raise ValueError("No valid benchmark scales selected. Use 5k_2k and/or 20k_2k.")
 
     datasets: dict[str, dict[str, Any]] = {}
     for name, size_cfg in bench_sizes.items():
@@ -257,4 +274,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    cli_args = parse_args()
+    main(scales=cli_args.scales)

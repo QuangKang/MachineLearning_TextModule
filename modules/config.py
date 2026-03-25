@@ -47,6 +47,8 @@ class Config:
 
     # Model
     model_type: str = "logistic_regression"  # naive_bayes | logistic_regression | svm
+    model_list: tuple[str, ...] = ("logistic_regression", "svm", "naive_bayes")
+    primary_metric: str = "f1_weighted"
     C: float = 1.0
     max_iter: int = 200
 
